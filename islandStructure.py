@@ -1,5 +1,33 @@
 from random import randint, choice
 from colorama import Fore, Style
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+
+def update_grid(plot, scanner_pos):
+    grid_data = np.zeros((plot.rows, plot.cols))
+    for r in range(plot.rows):
+        for c in range(plot.cols):
+            if [c, r] == scanner_pos:
+                grid_data[r, c] = 2
+            elif isinstance(plot.grid[r][c], IslandNode) and plot.grid[r][c].discovered:
+                grid_data[r, c] = 1
+            elif isinstance(plot.grid[r][c], IslandNode) and not plot.grid[r][c].discovered:
+                grid_data[r, c] = 3
+            else:
+                grid_data[r, c] = 0
+    plt.cla()
+    if not any(
+                isinstance(plot.grid[r][c], IslandNode) and not plot.grid[r][c].discovered
+                for r in range(plot.rows)
+                for c in range(plot.cols)
+            ):
+        plt.imshow(grid_data, cmap=ListedColormap(["blue", "green", "magenta"]))
+    else:
+        plt.imshow(grid_data, cmap=ListedColormap(["blue", "green", "magenta", "black"]))
+
+
+
 class IslandNode:
     def __init__(self, discovered=False):
         self.discovered = discovered
@@ -45,8 +73,12 @@ class Grid:
                 self.grid_instance.grid[spot[0]][spot[1]] = IslandNode()
                 nodes.append(spot)
                 queue.append(spot)
+                update_grid(self.grid_instance, [-1, -1])
+                plt.pause(0.05)
 
     def populate(self, n: int, size: int):
+        update_grid(self, [-1, -1])
+        plt.pause(0.5)
         for _ in range(n):
             retry = True
             while retry:
@@ -57,6 +89,8 @@ class Grid:
                 new_island = self.Island(self, x, y)
                 self.grid[x][y] = new_island
                 new_island.spread(size)
+                update_grid(self, [-1, -1])
+                plt.pause(0.5)
                 retry = False
 
     def display(self, scanner=[0, 0]):

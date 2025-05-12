@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
-import numpy as np
-from islandStructure import Grid, IslandNode
-from matplotlib.colors import ListedColormap
+from islandStructure import Grid, IslandNode, update_grid
 from pprint import pprint
+
 
 def discover_island(x: int, y: int, grid: Grid, nodes=None) -> list[tuple[int, int]]:
     if nodes is None:
@@ -23,31 +22,11 @@ def discover_island(x: int, y: int, grid: Grid, nodes=None) -> list[tuple[int, i
     return nodes
 
 
-def update_grid(plot, scanner_pos):
-    grid_data = np.zeros((plot.rows, plot.cols))
-    for r in range(plot.rows):
-        for c in range(plot.cols):
-            if [c, r] == scanner_pos:
-                grid_data[r, c] = 2
-            elif isinstance(plot.grid[r][c], IslandNode) and plot.grid[r][c].discovered:
-                grid_data[r, c] = 1
-            elif isinstance(plot.grid[r][c], IslandNode) and not plot.grid[r][c].discovered:
-                grid_data[r, c] = 3
-            else:
-                grid_data[r, c] = 0
-    plt.cla()
-    if not any(
-                isinstance(plot.grid[r][c], IslandNode) and not plot.grid[r][c].discovered
-                for r in range(plot.rows)
-                for c in range(plot.cols)
-            ):
-        plt.imshow(grid_data, cmap=ListedColormap(["blue", "green", "magenta"]))
-    else:
-        plt.imshow(grid_data, cmap=ListedColormap(["blue", "green", "magenta", "black"]))
+
 
 def main():
-    plot = Grid(30, 20)
-    plot.populate(5, 10)
+    plot = Grid(50, 30)
+    plot.populate(5, 20)
 
     discovered_islands = []
     for row in range(plot.rows):
